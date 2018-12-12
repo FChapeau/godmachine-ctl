@@ -6,7 +6,8 @@ before_script:
 script: gulp build
 deploy:
   provider: releases
-  file_glob: "dist/*"
+  file_glob: true
+  file: dist/*
   api_key: $GH_TOKEN
   skip_cleanup: true
   on:
