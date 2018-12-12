@@ -7,6 +7,7 @@ script: gulp build
 deploy:
   provider: releases
   file_glob: "dist/*"
+  api_key: "0bb0255a176e948c4482e15c3ae99057c2c5688f"
   skip_cleanup: true
   on:
     tags: true
