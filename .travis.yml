@@ -1,14 +1,14 @@
 language: node_js
 node_js:
-  - "10"
+- '10'
 before_script:
-  - npm install -g gulp-cli
+- npm install -g gulp-cli
 script: gulp build
 deploy:
   provider: releases
+  api_key:
+    secure: KSzufmbTKNGVQTvXEAQe7tKkJ1XeCwis/AKOcyOVU8wFJGIub6JL8XfGIu+kjleenmVQ2qXjaK362TYQtYr4FPWaMHltiZ36bf82Y+lMZ+ECSXsH5OBdU+WXFhM69+2y10HRP/P61rh12IX3eN7HbExdpkNMfYxGIciqwQUPIVvT3j4g5ZXm/cpFvGWHGmQUsq/yJsMtb9rpfHjtJfI1KQMarKkFZuplF+9FcIq9qRCKaZdzqFwTreEXNuAtYjGOVJJruTAgt2FiSksEDBIv7PXgV5dR5fto7DEW8YcNqgxbCjNpV/dnz7p1oKX0vh+XfWz/UfeAofT5voXxitr9sugl+wlbpLB//H6dp8qET0HpZ5Ip0p/BBRsp6sZ3vqJkbdXi0TJgiJyE4+vl+SMGUyX9RAiL7fYXyfQFe+27hXCs5MK539Aln0jU/vvJXbYPYMiNFEklWv0rq9n7lXr0TciNMV7un2Fs+qFcIImBNdJ04r5E6dDLeZ5VWYY6YK0DTSqh6M/3TIqSDmCN8vvxj2mjzySivLpBr3hljdm3ZmLJQERPsa1Ny1IpXqAJl/V0oNZ1LcBo66GFSGCxXluyA/dhwNUHhcT275s0SgCDBiqfyMZDQ5zZxKC+LpdwTTszfgHluIYrWBidDy9yxEiPRR6bz9RHZvxP8/kVDVvJxC0=
   file_glob: true
   file: dist/*
-  api_key: $GH_TOKEN
-  skip_cleanup: true
   on:
-    tags: true
+    repo: FChapeau/godmachine-ctl
