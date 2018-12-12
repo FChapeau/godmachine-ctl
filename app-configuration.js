@@ -12,7 +12,9 @@ let logger = winston.createLogger({
     ]
 });
 
-program.command("set")
+program
+    .command("set")
+    .description("Set configuration key")
     .option("-k, --key", "Configuration key to set")
     .option("-v, --value", "Configuration value to set")
     .action(function(key, value, command){
