@@ -4,3 +4,9 @@ node_js:
 before_script:
   - npm install -g gulp-cli
 script: gulp build
+deploy:
+  provider: releases
+  file_glob: "dist/*"
+  skip_cleanup: true
+  on:
+    tags: true
