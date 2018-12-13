@@ -32,7 +32,25 @@ function ReadConfig (){
 function SetConfig(key, value){
     let config = ReadConfig();
 
-    config[key] = value;
+    var keyparts = key.split(".");
+
+    if (keyparts.length === 1){
+        config[key] = value;
+    } else {
+        var tomerge = keyparts.reverse().reduce(function(acc, val, index){
+            if (index === 0){
+                acc[val] = value;
+            } else {
+                var obj = {};
+                obj[val] = acc;
+                acc = obj
+            }
+            return acc;
+        }, {});
+
+        config = Object.assign(config, tomerge);
+    }
+
 
     fs.writeFileSync(filename, encrypt(JSON.stringify(config)), )
 }

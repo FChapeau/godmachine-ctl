@@ -14,12 +14,23 @@ program
     .option("-v, --value <key>", "Configuration value to set")
     .option("-f, --force", "Force application of setting")
     .action(function(command){
-        if (command.force){
-            logger.info(`${command.key} set to: ${command.value}`);
-            configManager.SetConfig(command.key, command.value);
-        } else {
-            logger.gm(ominous.getRandomUnauthorizedMessage())
+        if (!command.key){
+            logger.error(`-k argument required`);
         }
+
+        if (!command.value){
+            logger.error(`-v argument required`)
+        }
+
+        if (command.key && command.value){
+            if (command.force){
+                logger.info(`${command.key} set to: ${command.value}`);
+                configManager.SetConfig(command.key, command.value);
+            } else {
+                logger.gm(ominous.getRandomUnauthorizedMessage())
+            }
+        }
+
     });
 
 program
@@ -48,6 +59,28 @@ program
             fs.writeFileSync(destination, JSON.stringify(configManager.ReadConfig(), null, 2))
         } else {
             logger.gm(ominous.getRandomUnauthorizedMessage());
+        }
+    });
+
+program.command("firewall <sector>")
+    .description("Set firewall status in [sector]")
+    .option("-a, --active", "Set status as active")
+    .option("-i, --inactive", "Set status as inactive")
+    .action(function(sector, command){
+        var value = null;
+        if (command.active){
+            value = true;
+        } else if (command.inactive){
+            value = false;
+        }
+
+        if (command.active && command.inactive || !command.active && !command.inactive){
+            logger.error("Please use only one of the -a or -i flags")
+        }
+
+        if (value != null){
+            configManager.SetConfig(`firewall.${sector}`, value);
+            logger.info(`Set firewall in sector "${sector}" to ${value?"Active":"Inactive"}`)
         }
     });
 
