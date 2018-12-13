@@ -1,5 +1,4 @@
 const fs = require("fs");
-const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const algorithm = "aes256";
 const password = "supersecret";
