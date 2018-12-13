@@ -2,6 +2,7 @@ const fs = require("fs");
 const crypto = require("crypto");
 const algorithm = "aes256";
 const password = "supersecret";
+const deepmerge = require("deepmerge");
 
 var filename = "config";
 
@@ -48,7 +49,7 @@ function SetConfig(key, value){
             return acc;
         }, {});
 
-        config = Object.assign(config, tomerge);
+        config = deepmerge(config, tomerge);
     }
 
 

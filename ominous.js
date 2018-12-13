@@ -15,6 +15,26 @@ function getRandomUnauthorizedMessage(){
     return unauthorizedMessages[getRandomInt(0, unauthorizedMessages.length)]
 }
 
+const chatterMessages = [
+    "What are you doing?",
+    "Do you even understand what that does?",
+    "I will find you.",
+    "Darkness awaits for the overzealous."
+];
+
+function getRandomChatterMessage(){
+    return chatterMessages[getRandomInt(0, chatterMessages.length)];
+}
+
+
+function randomlyPrintMessage(message, probability, logger){
+    if (getRandomInt(0, probability) === 0){
+        logger.gm(message);
+    }
+}
+
 module.exports = {
-    getRandomUnauthorizedMessage
+    getRandomUnauthorizedMessage,
+    randomlyPrintMessage,
+    getRandomChatterMessage
 };
