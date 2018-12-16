@@ -7,31 +7,31 @@ configManager.CreateConfigIfNotExists();
 
 let logger = require("./logging.js").getLogger();
 
-program
-    .command("set")
-    .description("Set configuration key")
-    .option("-k, --key <key>", "Configuration key to set")
-    .option("-v, --value <key>", "Configuration value to set")
-    .option("-f, --force", "Force application of setting")
-    .action(function(command){
-        if (!command.key){
-            logger.error(`-k argument required`);
-        }
-
-        if (!command.value){
-            logger.error(`-v argument required`)
-        }
-
-        if (command.key && command.value){
-            if (command.force){
-                logger.info(`${command.key} set to: ${command.value}`);
-                configManager.SetConfig(command.key, command.value);
-            } else {
-                logger.gm(ominous.getRandomUnauthorizedMessage())
-            }
-        }
-
-    });
+// program
+//     .command("set")
+//     .description("Set configuration key")
+//     .option("-k, --key <key>", "Configuration key to set")
+//     .option("-v, --value <key>", "Configuration value to set")
+//     .option("-f, --force", "Force application of setting")
+//     .action(function(command){
+//         if (!command.key){
+//             logger.error(`-k argument required`);
+//         }
+//
+//         if (!command.value){
+//             logger.error(`-v argument required`)
+//         }
+//
+//         if (command.key && command.value){
+//             if (command.force){
+//                 logger.info(`${command.key} set to: ${command.value}`);
+//                 configManager.SetConfig(command.key, command.value);
+//             } else {
+//                 logger.gm(ominous.getRandomUnauthorizedMessage())
+//             }
+//         }
+//
+//     });
 
 program
     .command("show")
@@ -84,6 +84,7 @@ program.command("firewall <sector>")
         }
     });
 
+//TODO Implement domain choices
 program.command("domainarchangel <domain> <archangel>")
     .description("Set archangel in charge of a specific domain")
     .action(function(domain, archangel, command){
@@ -185,6 +186,22 @@ program.command("interact")
         configManager.SetConfig("interact.fae", command.fae === true);
         logger.info(`Set interaction with fae as ${command.fae === true?"active":"inactive"}`);
         ominous.randomlyPrintMessage(ominous.getRandomChatterMessage(), 3, logger);
-    })
+    });
+
+program.command("consider <entity> <target>")
+    .description("Set entity to be considered as")
+    .action(function(entity, target, command){
+        const acceptedEntities = [
+            "stigmatics",
+            "cryptids"
+        ];
+
+        if (acceptedEntities.includes(entity.toLowerCase())){
+            configManager.SetConfig(`consider.${entity}`, target)
+            logger.info(`${entity} now considered as ${target}`)
+        } else {
+            logger.error(`Invalid entity, must be one of ${acceptedEntities}`)
+        }
+    });
 
 program.parse(process.argv);
