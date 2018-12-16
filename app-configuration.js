@@ -41,14 +41,6 @@ program
     });
 
 program
-    .command("listkeys")
-    .description("List possible configuration keys")
-    .option("-r, --recentlyaltered", "List only recently altered keys")
-    .action(function(recentlyaltered, command){
-
-    });
-
-program
     .command("export <destination>")
     .description("Export configuration to text format")
     .action(async function(destination, command){
@@ -84,12 +76,34 @@ program.command("firewall <sector>")
         }
     });
 
-//TODO Implement domain choices
 program.command("domainarchangel <domain> <archangel>")
     .description("Set archangel in charge of a specific domain")
     .action(function(domain, archangel, command){
-        configManager.SetConfig(`domainarchangel.${domain}`, archangel);
-        logger.info(`Set archangel in charge of domain "${domain}" as "${archangel}"`);
+        let valid = true;
+
+        const domains = [
+            "hostiles",
+            "friendlies",
+            "neutrals",
+            "targets",
+            "avoided",
+            "tools",
+            "anomalies",
+            "repairs",
+            "updates",
+            "construction"
+        ];
+
+        if (!domains.includes(domain.toLowerCase())){
+            logger.error(`Domain must be one of [${domains}]`);
+            valid = false;
+        }
+
+        if (valid){
+            configManager.SetConfig(`domainarchangel.${domain}`, archangel);
+            logger.info(`Set archangel in charge of domain "${domain}" as "${archangel}"`);
+        }
+
     });
 
 program.command("sector")
@@ -118,12 +132,17 @@ program.command("hostile")
     .action(function(command){
         configManager.SetConfig("hostile.demons", command.demons === true);
         logger.info(`Set demons as ${!command.demons?"not ":""}hostile`);
+        ominous.randomlyPrintMessage(ominous.getRandomChatterMessage(), 3, logger);
 
         configManager.SetConfig("hostile.fallen", command.fallen === true);
         logger.info(`Set fallen as ${!command.fallen?"not ":""}hostile`);
+        ominous.randomlyPrintMessage(ominous.getRandomChatterMessage(), 3, logger);
+
 
         configManager.SetConfig("hostile.humans", command.humans === true);
-        logger.info(`Set humans as ${!command.humans?"not ":""}hostile`)
+        logger.info(`Set humans as ${!command.humans?"not ":""}hostile`);
+        ominous.randomlyPrintMessage(ominous.getRandomChatterMessage(), 3, logger);
+
     });
 
 program.command("angelcount <count>")
@@ -188,19 +207,216 @@ program.command("interact")
         ominous.randomlyPrintMessage(ominous.getRandomChatterMessage(), 3, logger);
     });
 
-program.command("consider <entity> <target>")
-    .description("Set entity to be considered as")
-    .action(function(entity, target, command){
+program.command("consider <entity> <relation>")
+    .description("Set God Machine to have specified relation with specified entity.")
+    .action(function(entity, relation, command){
+        let valid = true;
+
         const acceptedEntities = [
             "stigmatics",
             "cryptids"
         ];
 
-        if (acceptedEntities.includes(entity.toLowerCase())){
-            configManager.SetConfig(`consider.${entity}`, target)
-            logger.info(`${entity} now considered as ${target}`)
+        const acceptedRelations = [
+            "hostiles",
+            "friendlies",
+            "neutral",
+            "targets",
+            "avoided",
+            "tools"
+        ];
+
+        if (!acceptedRelations.includes(relation.toLowerCase())){
+            logger.error(`Invalid relation, must be one of [${acceptedRelations}]`);
+            valid = false;
+        }
+
+        if (!acceptedEntities.includes(entity.toLowerCase())){
+            logger.error(`Invalid entity, must be one of [${acceptedEntities}]`);
+            valid = false;
+        }
+
+        if (valid) {
+            configManager.SetConfig(`consider.${entity}`, relation);
+            logger.info(`${entity} now considered as ${relation}`)
+            ominous.randomlyPrintMessage(ominous.getRandomChatterMessage(), 1, logger);
+
+        }
+
+    });
+
+program.command("energydistribution <setting>")
+    .description("Set matrix energy distribution to a specified setting")
+    .action(function(setting, command){
+        let valid = true;
+        const validSettings = [
+            "programs",
+            "infrastructures",
+            "cults",
+            "hardware"
+        ];
+
+        if (!validSettings.includes(setting.toLowerCase())){
+            logger.error(`Invalid setting, must be one of [${validSettings}]`)
+        }
+
+        if (valid){
+            configManager.SetConfig(`energydistribution`, setting);
+            logger.info(`Set matrix energy distribution setting to ${setting}`);
+            ominous.randomlyPrintMessage(ominous.getRandomChatterMessage(), 1, logger);
+
+        }
+    });
+
+program.command("hunterawakeningprotocol <value>")
+    .description("Set percentage of chance of the hunter awakening protocol to activate")
+    .action(function(value, command){
+        let valid = true;
+        let valueNum = Number(value);
+
+        if (isNaN(valueNum)){
+            valid = false;
+            logger.error("Entered value was not a number")
+        }
+
+        if (valid){
+            configManager.SetConfig("hunterawakeningprotocol", valueNum);
+            logger.info(`Set hunter awakening protocol chance to ${value}%`);
+            ominous.randomlyPrintMessage(ominous.getRandomChatterMessage(), 1, logger);
+
+        }
+
+    });
+
+program.command("infrastructures")
+    .description("Sets priority infrastructure and infrastructure priorities")
+    .option("-p, --priorityinfrastructure <priority>", "Sets priority infrastructure")
+    .option("-i, --infrastructurepriority <infrastructure>", "Sets infrastrcuture priority")
+    .action(function(command){
+        const validPriorities = [
+            "advancement",
+            "creation",
+            "cult",
+            "administration",
+            "protection",
+            "factory"
+        ];
+        let valid = true;
+
+        if (command.infrastructurepriority){
+            if (!validPriorities.includes(command.infrastructurepriority.toLowerCase())){
+                logger.error(`Invalid infrastructure priority, must be one of [${validPriorities}]`)
+                valid = false;
+            }
+
+            if (valid){
+                configManager.SetConfig("infrastructures.infrastrcuturepriority", command.infrastructurepriority);
+                logger.info(`Set infrastructure priority to ${command.infrastructurepriority}`)
+            }
+        }
+
+        if (command.priorityinfrastructure){
+            configManager.SetConfig("infrastructures.priorityinfrastructures", command.priorityinfrastructure);
+            logger.info(`Set priority infrastructures to ${command.priorityinfrastructure}`)
         } else {
-            logger.error(`Invalid entity, must be one of ${acceptedEntities}`)
+            logger.error(`Priority infrastructure not specified`)
+        }
+    });
+
+program.command("humancontrol <value>")
+    .description("Set degree of human control, between 1 and 5 inclusively.")
+    .action(function(value, command){
+        let valid = true;
+        let valueNum = Number(value);
+
+        if (isNaN(valueNum)){
+            logger.error("Value is not a number");
+            valid = false;
+        }
+
+        if (!(1 <= value && value<= 5)) {
+            logger.error("Value must be between 1 and 5");
+            valid = false;
+        }
+
+        if (valid){
+            configManager.SetConfig("humancontrol", valueNum);
+        }
+    });
+
+program.command("matrixcreate")
+    .description("Create occult matrix")
+    .option("-s, --sector <sector>", "Set sector hosting the matrix")
+    .option("-p, --purpose <purpose>", "Set matrix purpose")
+    .option("-a, --agenda <agenda>", "Set matrix agenda")
+    .option("-i, --incarnation <incarnation>", "Set matrix incarnation")
+    .action(function(command){
+        let valid = true;
+
+        const validPurposes = [
+            "weaponry",
+            "maintenance",
+            "construction",
+            "evolution"
+        ];
+
+        const validAgendas = [
+            "temptor",
+            "inquisitor",
+            "integrator",
+            "saboteur"
+        ];
+
+        const validIncarnations = [
+            "guardian",
+            "messanger",
+            "destroyer",
+            "psychopomp"
+        ];
+
+        if (!command.sector){
+            valid = false;
+            logger.error("Sector not specified")
+        }
+
+        if (command.purpose){
+            if (!validPurposes.includes(command.purpose.toLowerCase())){
+                logger.error(`Invalid purpose, mut be one of [${validPurposes}]`);
+                valid = false;
+            }
+        } else {
+            logger.error("Purpose not specified");
+        }
+
+        if (command.agenda){
+            if (!validAgendas.includes(command.agenda.toLowerCase())){
+                logger.error(`Invalid agenda, mut be one of [${validAgendas}]`);
+                valid = false;
+            }
+        } else {
+            logger.error("Agenda not specified");
+        }
+
+        if (command.incarnation){
+            if (!validIncarnations.includes(command.incarnation.toLowerCase())){
+                logger.error(`Invalid incarnation, mut be one of [${validIncarnations}]`);
+                valid = false;
+            }
+        } else {
+            logger.error("Incarnation not specified");
+        }
+
+        if (valid){
+            var toadd = {
+                sector: command.sector,
+                purpose: command.purpose,
+                agenda: command.agenda,
+                incarnation: command.incarnation
+            };
+
+            configManager.AddToConfigArray("matrix", toadd);
+            logger.info(`Added following matrix:\n${toadd}`);
+            ominous.randomlyPrintMessage(ominous.getRandomChatterMessage(), 2, logger);
         }
     });
 

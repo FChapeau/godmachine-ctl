@@ -3,17 +3,18 @@ const crypto = require("crypto");
 const algorithm = "aes256";
 const password = "supersecret";
 const deepmerge = require("deepmerge");
+const Notation = require("notation");
 
 var filename = "config";
 
 function encrypt(text){
-    var cipher = crypto.createCipher(algorithm,password)
+    var cipher = crypto.createCipher(algorithm,password);
     var crypted = Buffer.concat([cipher.update(Buffer.from(text)),cipher.final()]);
     return crypted;
 }
 
 function decrypt(buffer){
-    var decipher = crypto.createDecipher(algorithm,password)
+    var decipher = crypto.createDecipher(algorithm,password);
     var dec = Buffer.concat([decipher.update(buffer) , decipher.final()]);
     return dec.toString();
 }
@@ -33,25 +34,26 @@ function ReadConfig (){
 function SetConfig(key, value){
     let config = ReadConfig();
 
-    var keyparts = key.split(".");
+    var notation = new Notation(config);
+    notation.set(key, value);
+    config = notation.value;
 
-    if (keyparts.length === 1){
-        config[key] = value;
-    } else {
-        var tomerge = keyparts.reverse().reduce(function(acc, val, index){
-            if (index === 0){
-                acc[val] = value;
-            } else {
-                var obj = {};
-                obj[val] = acc;
-                acc = obj
-            }
-            return acc;
-        }, {});
+    fs.writeFileSync(filename, encrypt(JSON.stringify(config)), )
+}
 
-        config = deepmerge(config, tomerge);
+function AddToConfigArray(key, value){
+    let config = ReadConfig();
+    let notation = new Notation(config);
+    let configValue = notation.get(key);
+
+    if (configValue === null || configValue === undefined){
+        configValue = [];
     }
 
+    configValue.push(value);
+
+    notation.set(key, configValue);
+    config = notation.value;
 
     fs.writeFileSync(filename, encrypt(JSON.stringify(config)), )
 }
@@ -59,5 +61,6 @@ function SetConfig(key, value){
 module.exports = {
     ReadConfig,
     CreateConfigIfNotExists,
-    SetConfig
+    SetConfig,
+    AddToConfigArray
 };
