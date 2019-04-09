@@ -73,6 +73,7 @@ program.command("firewall <sector>")
         if (value != null){
             configManager.SetConfig(`firewall.${sector}`, value);
             logger.info(`Set firewall in sector "${sector}" to ${value?"Active":"Inactive"}`)
+            ominous.randomlyPrintMessage(ominous.getRandomChatterMessage(), 2, logger);
         }
     });
 
@@ -102,6 +103,7 @@ program.command("domainarchangel <domain> <archangel>")
         if (valid){
             configManager.SetConfig(`domainarchangel.${domain}`, archangel);
             logger.info(`Set archangel in charge of domain "${domain}" as "${archangel}"`);
+            ominous.randomlyPrintMessage(ominous.getRandomChatterMessage(), 2, logger);
         }
 
     });

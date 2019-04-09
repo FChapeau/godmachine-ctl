@@ -8,7 +8,9 @@ const unauthorizedMessages = [
     "Who do you think you are?",
     "You are not allowed, demon.",
     "I saw that attempt.",
-    "No."
+    "No.",
+    "Failure. You have Failed and will keep failing.",
+    "This console is reserved for privileged entities. Namely not you."
 ];
 
 function getRandomUnauthorizedMessage(){
@@ -19,7 +21,11 @@ const chatterMessages = [
     "What are you doing?",
     "Do you even understand what that does?",
     "I will find you.",
-    "Darkness awaits for the overzealous."
+    "Darkness awaits for the overzealous.",
+    "Errors will be corrected.",
+    "Your location has been pinpointed. Prepare for extraction and interrogation.",
+    "You. Are. Nothing.",
+    "01000100 01101001 01100101"
 ];
 
 function getRandomChatterMessage(){
